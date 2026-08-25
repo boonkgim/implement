@@ -29,8 +29,16 @@ Before scoping anything, establish four things and record them in the plan:
 1. **The layers and their forced order.** Which skills own which directories, and what forces
    the order between them — usually a generated artifact, where one layer's output is the
    next layer's input. Never reorder a forced order; it is a dependency, not a preference.
-2. **The gate.** The exact commands that decide green, and the directory they run from. Take
-   them from the repo's scripts, verbatim.
+2. **The two gates.** Most repos have both, under different script names, and running the
+   slow one on every pass is what makes a run take all morning.
+   - The **inner gate** — the slice's own tests, plus lint and types over the changed scope.
+     This runs on every pass of the loop.
+   - The **full gate** — the whole suite, integration included. This runs once, after the
+     loop goes green, and the commit waits on it.
+
+   Take both commands from the repo's scripts, verbatim, with the directory they run from.
+   If the repo declares only one, that one is both gates, every pass pays for the whole
+   suite, and the report says so.
 3. **The cross-cutting and rules skills.** Two kinds load *in addition to* a layer skill
    rather than instead of it: cross-cutting skills that span layers — authentication,
    payments, mail — and rules skills that sit under them, holding what would survive a fork.
@@ -100,7 +108,7 @@ Otherwise run the loop yourself. Five subagents, each in fresh context, in order
 | 2   | implement | the layer skills for this slice in the repo's forced order, plus any cross-cutting skill it touches | code that makes the test pass | source files     |
 | 3   | critique  | `critique`                                                                        | a ranked verdict                               | nothing          |
 | 4   | fix       | the blocking findings, plus the same layer skills                                 | fixes                                          | test and source  |
-| 5   | gate      | —                                                                                 | the gate's output                              | nothing          |
+| 5   | gate      | —                                                                                 | the inner gate's output                        | nothing          |
 
 Rules that make the loop worth running:
 
@@ -110,10 +118,15 @@ Rules that make the loop worth running:
   implementer's summary, not its reasoning. A critic that reads the story reviews the story.
 - **Assert counts, not exit codes**, at the gate. A suite that stopped collecting a file looks
   identical to one that passes.
-- If the critic returns blocking, run 4, then 5. If the gate is red, run 3 and 4 again.
+- If the critic returns blocking, run 4, then 5. If the inner gate is red, run 3 and 4 again.
+- **The inner gate runs every pass. The full gate runs once, after it.** The loop needs
+  feedback in seconds, and the whole suite on every pass proves nothing about this slice that
+  the slice's own tests did not already prove. Red at the full gate is a regression in a slice
+  that was already green: hand it to the critic as a blocking finding and run 4 and 5 again,
+  against the same three-pass limit.
 - **Three passes maximum**, then the slice has failed. A fourth pass on the same defect is a
   loop, not progress.
-- **Commit only when green end to end**, and never start the next slice with this one
+- **Commit only when the full gate is green**, and never start the next slice with this one
   half-green.
 
 ## 5. When a slice will not go green
@@ -131,12 +144,12 @@ Rules that make the loop worth running:
 
 One file, and the only thing a person should have to read:
 
-- **What landed** — each slice, its commit, and what it now does.
+- **What got built** — each slice, its commit, and what it now does.
 - **What failed** — the branch, the last verdict, the last gate output.
-- **What was classified horizontal** and therefore never attempted, with the pipeline each one
-  would have to prove.
-- **What was in the PRD and never became a slice.** The silent-miss line. Nothing else in the
-  run will surface a capability that was simply not seen.
+- **Not attempted** — what was classified horizontal, with the pipeline each one would have to
+  prove.
+- **Never started** — what was in the PRD and never became a slice. Nothing else in the run
+  will surface a capability that was simply not seen.
 - **Non-blocking findings**, unfixed by design.
 - **How to see it working** — the commands, in order, including whatever must be running.
 
