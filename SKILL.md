@@ -19,7 +19,9 @@ did not, and what was never attempted.
 - **Never writes code itself.** Every file change is made by a subagent that has loaded the
   skill owning that file. Delegation is what keeps a rule enforceable across a long run.
 - **Never deploys.** The run ends at the local gate and the commit. A production gate needs
-  credentials this run must not hold, and an observation only a person can make.
+  credentials this run must not hold, and an observation only a person can make. Hand it back
+  by name: if the repo has a skill that owns the production gate, the report says which one and
+  which commits it should be given.
 - **Never commits a slice that is not green end to end.**
 
 ## 1. Discover the repo
@@ -152,6 +154,8 @@ One file, and the only thing a person should have to read:
   will surface a capability that was simply not seen.
 - **Non-blocking findings**, unfixed by design.
 - **How to see it working** — the commands, in order, including whatever must be running.
+- **What is left to deploy** — the commits, and the skill that owns the production gate. A run
+  that ends green and says nothing about the deploy reads as finished when it is not.
 
 If the repo has a `create-user-test` skill, run it last, against **what was built** rather
 than what was specified. That script is how a person checks the run without reading the code.
