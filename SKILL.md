@@ -159,6 +159,9 @@ One file, and the only thing a person should have to read:
 
 If the repo has a `create-user-test` skill, run it last, against **what was built** rather
 than what was specified. That script is how a person checks the run without reading the code.
+Then, if the repo also has `run-user-test`, run that over the script it just wrote: it is the
+same check done by a machine, and what it finds is what nobody has to spend a tester's hour
+on. Name its report in your own — a report written and never opened is the same as no report.
 
 ## Never
 
