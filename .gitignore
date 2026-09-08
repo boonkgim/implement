@@ -57,3 +57,6 @@ tmp/
 temp/
 *.tmp
 *.bak
+
+# This skill's own ephemeral subagent handoff files (reference/loop.md)
+.artifacts/
