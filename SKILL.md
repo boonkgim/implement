@@ -7,7 +7,8 @@ description: Build everything the design documents describe, slice by slice, wit
 
 **Shape: orchestration.** It owns scope, order, gates, the commit and the report, and no
 mechanics whatsoever — every rule about how code is written lives in a skill it names rather
-than in this file. See `skill-shapes`.
+than in this file. (If your skill library sorts skills by shape — principle, practice,
+orchestration — this is the orchestration kind: it owns process, never mechanics.)
 
 The design documents are the specification. This skill turns them into committed, tested code
 without being asked a question in between, and returns one report that says what landed, what
@@ -106,11 +107,16 @@ Otherwise run the loop yourself. Five subagents, each in fresh context, in order
 
 | #   | Subagent  | Loads                                                                            | Returns                                       | May write        |
 | --- | --------- | -------------------------------------------------------------------------------- | --------------------------------------------- | ---------------- |
-| 1   | test      | `code-test`                                                                       | a failing test, and the failure message        | test files       |
+| 1   | test      | a skill for writing a failing test first, discovering the repo's runner rather than assuming one | a failing test, and the failure message        | test files       |
 | 2   | implement | the layer skills for this slice in the repo's forced order, plus any cross-cutting skill it touches | code that makes the test pass | source files     |
-| 3   | critique  | `critique`                                                                        | a ranked verdict                               | nothing          |
+| 3   | critique  | a skill for reading a diff adversarially, in fresh context                       | a ranked verdict                               | nothing          |
 | 4   | fix       | the blocking findings, plus the same layer skills                                 | fixes                                          | test and source  |
 | 5   | gate      | —                                                                                 | the inner gate's output                        | nothing          |
+
+This loop was written alongside two companion skills shaped exactly for rows 1 and 3 —
+`code-test` and `critique` — and assumes something like them is present. If your project
+names them differently, or handles writing the test and reading the diff some other way,
+load that instead; nothing about the loop depends on their names.
 
 Rules that make the loop worth running:
 
