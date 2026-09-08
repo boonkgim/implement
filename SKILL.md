@@ -1,6 +1,7 @@
 ---
 name: implement
 description: Build everything the design documents describe, slice by slice, with no human between the slices. Use when a PRD, a data model and a mock UI are committed and the application has to be made real. Owns discovery, scope, slice order, the per-slice loop of test → implement → critique → fix → gate, the commit, and the report; delegates every file change to the repo's own layer skills. Application-agnostic — it discovers the repo's layers, gates and skills rather than assuming them. Stops at the local gate; it never deploys.
+license: MIT
 ---
 
 # implement — hand over the work, get back a report
